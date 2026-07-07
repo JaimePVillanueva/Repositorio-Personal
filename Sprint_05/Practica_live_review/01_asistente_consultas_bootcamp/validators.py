@@ -20,6 +20,26 @@ from config import (
 
 
 def validar_consulta(datos: dict) -> list[str]:
+    
+    errores = []
+
+    nombre = str(datos.get("nombre", "")).strip()
+    if not nombre:
+        errores.append("Nombre inválido: no puede estar vacío")
+      
+    email = str(datos.get("email", "")).strip()
+    if not email:
+        errores.append("Email inválido: no puede estar vacío")
+    elif email.fullmatch(PATRON_EMAIL) is None:
+        errores.append("Email inválido: formato incorrecto")
+
+    mensaje = str(datos.get("mensaje", "")).strip()
+    if len(mensaje) < MIN_CHARS_MENSAJE:
+        errores.append("Mensaje inválido: demasiado corto")
+    elif len(mensaje) > MAX_CHARS_MENSAJE:
+        errores.append("Mensaje inválido: demsiado largo")
+
+    return errores
     """TODO: clasificación — valida nombre, email y mensaje antes de llamar a Gemini.
 
     Entrada: {"nombre": "Ana", "email": "ana@ejemplo.com", "mensaje": "..."}

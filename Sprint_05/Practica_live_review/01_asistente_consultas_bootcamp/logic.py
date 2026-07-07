@@ -22,6 +22,8 @@ from pathlib import Path
 
 from validators import validar_consulta
 
+import json
+
 
 def respuesta_ok(mensaje: str, data: dict | None = None) -> dict:
     return {"status": "ok", "mensaje": mensaje, "data": data or {}}
@@ -32,6 +34,19 @@ def respuesta_error(mensaje: str, errores: list[str]) -> dict:
 
 
 def parsear_clasificacion(raw: str) -> dict:
+
+    try:
+        dicc = json.loads(raw)
+    except json.JSONDecodeError:
+        raise ValueError("JSON Inválido")
+    
+    if "category" and "priority" and "summary" not in dicc:
+        raise ValueError("El JSON no cuenta con las claves adecuadas")
+    if dicc.get("category").lower() not in ("academico", "tecnico", "administrativo", "otro"):
+        raise ValueError("La categoría no es válida")
+    if dicc.get("priority").lower() not in ("baja, media, alta"):
+        raise ValueError("La prioridad no es válida")
+    
     """TODO: clasificación — json.loads + whitelist de category y priority.
 
     Entrada: '{"category": "tecnico", "priority": "media", "summary": "..."}'
@@ -40,7 +55,6 @@ def parsear_clasificacion(raw: str) -> dict:
 
     Ver README FASE 1, Tarea 3.
     """
-    raise NotImplementedError("Implementa parsear_clasificacion()")
 
 
 def clasificar_consulta(datos: dict) -> dict:
